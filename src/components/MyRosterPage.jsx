@@ -1,3 +1,3 @@
 export default function MyRosterPage() {
-  return <div>MyRosterPage</div>;
+  return <div className="min-h-screen">MyRosterPage</div>;
 }

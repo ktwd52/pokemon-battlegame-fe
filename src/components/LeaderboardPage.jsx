@@ -1,3 +1,3 @@
 export default function LeaderboardPage() {
-  return <div>LeaderboardPage</div>;
+  return <div className="min-h-screen">LeaderboardPage</div>;
 }
