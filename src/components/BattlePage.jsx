@@ -169,6 +169,8 @@ export default function BattlePage() {
   }
 
   let attacker = "player";
+
+  // useEffect to handle the battle logic and interval
   useEffect(() => {
     if (enemyPoki.spd > playerPoki.spd) attacker = "enemy";
 
@@ -186,55 +188,42 @@ export default function BattlePage() {
 
   function BattleController() {
     if (attacker == "player") {
-      const dmg = calculateDamage(playerPoki, enemyPoki);
-      damageEnemy(dmg);
-      setCombatLog((prev) => [{ color: "player", attacker: playerPoki.name, defender: enemyPoki.name, damage: dmg }, ...prev]);
+      setEnemyPoki(attack(playerPoki, enemyPoki, "player"));
       attacker = "enemy";
     } else {
-      const dmg = calculateDamage(enemyPoki, playerPoki);
-      damagePlayer(dmg);
-      setCombatLog((prev) => [{ color: "enemy", attacker: enemyPoki.name, defender: playerPoki.name, damage: dmg }, ...prev]);
+      setPlayerPoki(attack(enemyPoki, playerPoki, "enemy"));
       attacker = "player";
     }
   }
 
+  function attack(attacker, defender, attackerText) {
+    const dmg = calculateDamage(attacker, defender);
+    defender.hp -= dmg;
+    setCombatLog((prev) => [
+      { color: attackerText, attacker: attacker.name, defender: defender.name, damage: dmg, defenderHp: defender.hp },
+      ...prev,
+    ]);
+    if (defender.hp <= 0) {
+      setWinner(attacker.name);
+      setCombatInProgress(false);
+      // setCombatLog()
+    }
+    return defender;
+  }
+
+  // Calculate damage based on attacker's attack and defender's defense
   function calculateDamage(attacker, defender) {
     const randomFactor = Math.random() * 0.5 + 0.5;
     return Math.floor((attacker.atk / defender.def) * (randomFactor * 10));
   }
 
-  function damageEnemy(damage) {
-    setEnemyPoki((prev) => {
-      const hpLeft = prev.hp - damage;
-      if (hpLeft <= 0) {
-        // ShopPopup(playerPoki.name);
-        setWinner(playerPoki.name);
-        setCombatInProgress(false);
-      }
-      return { ...prev, hp: hpLeft };
-    });
-  }
-
-  function damagePlayer(damage) {
-    setPlayerPoki((prev) => {
-      const hpLeft = prev.hp - damage;
-
-      if (hpLeft <= 0) {
-        // ShopPopup(enemyPoki.name);
-        setWinner(enemyPoki.name);
-        setCombatInProgress(false);
-      }
-      return { ...prev, hp: hpLeft };
-    });
-  }
-
-  function ShopPopup(winnerName) {
-    setWinner(winnerName);
-    document.getElementById("battleResult").showModal();
-  }
+  // function ShopPopup(winnerName) {
+  //   setWinner(winnerName);
+  //   document.getElementById("battleResult").showModal();
+  // }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen py-4">
       <p className=" text-center text-3xl mt-4">Prepare for the Battle!</p>
       <Popup winner={winner} />
       <div className="flex justify-evenly gap-4 mt-12 items-center max-w-[40rem] m-auto">
@@ -243,7 +232,7 @@ export default function BattlePage() {
         <PokemonBattleCard pokemon={enemyPoki} />
       </div>
       {combatMode ? (
-        <div className="max-w-[40rem] m-auto text-center">
+        <div className="max-w-[40rem] m-auto text-center ">
           {winner == "Undefined" ? (
             <div className="bg-primary py-4 mt-4 text-xl">Battle log</div>
           ) : (
@@ -256,8 +245,8 @@ export default function BattlePage() {
               )}
             </div>
           )}
-          <div className="text-left mb-4 py-4 bg-base-300">
-            <div className="max-w-[30rem] m-auto">
+          <div className="mb-4 py-4 bg-base-300 flex justify-center">
+            <div className="text-left max-w-[30rem] m-auto ">
               {combatLog.map((entry) => {
                 return <LogEntry entry={entry} />;
               })}
@@ -275,10 +264,13 @@ export default function BattlePage() {
   );
 }
 
-const LogEntry = ({ entry: { color, attacker, defender, damage } }) => {
+const LogEntry = ({ entry: { color, attacker, defender, damage, defenderHp } }) => {
   return (
-    <div>
-      <p className={color == "player" ? "text-base" : "text-accent"}>{`${attacker} deals ${damage} to ${defender}!`}</p>
+    <div className="">
+      {defenderHp <= 0 && <p className="text-warning text-lg">{`${defender} has been defeated!`}</p>}
+      <div className={color == "player" ? "text-base" : "text-accent"}>
+        {attacker} deals <span className="font-bold">{damage}</span> damage to {defender}!
+      </div>
     </div>
   );
 };
