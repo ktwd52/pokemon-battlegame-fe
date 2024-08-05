@@ -2,6 +2,7 @@ import PokemonCard from "./PokemonCard";
 
 const dummyPokemon = {
   name: "bulbasaur",
+  sprites: { front_default: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" },
   stats: [
     {
       base_stat: 45,
@@ -58,7 +59,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen text-center bg-base-100 max-w-[80rem] m-auto">
       <p className="text-2xl my-6">Pokemons</p>
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-6 gap-4">
         <PokemonCard pokemon={dummyPokemon} />
         <PokemonCard pokemon={dummyPokemon} />
         <PokemonCard pokemon={dummyPokemon} />
