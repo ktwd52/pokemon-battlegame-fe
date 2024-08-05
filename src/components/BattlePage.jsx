@@ -1,3 +1,3 @@
 export default function BattlePage() {
-  return <div>Battle Page</div>;
+  return <div className="min-h-screen">Battle Page</div>;
 }
