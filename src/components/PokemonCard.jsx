@@ -1,8 +1,8 @@
 export default function PokemonCard({ pokemon }) {
   return (
-    <div className="bg-teal-900 text-stone-100 flex flex-col items-center rounded-xl shadow">
+    <div className="bg-black text-base-content flex flex-col items-center rounded-xl shadow">
       <img src={pokemon.sprites.front_default} alt="" />
-      <h2 className="font-semibold">{pokemon.name}</h2>
+      <h2 className="font-semibold text-lg">{pokemon.name}</h2>
       <div className="flex gap-2 items-center justify-between w-full px-3">
         <label for="hp">HP</label>
         <meter value={pokemon.stats[0].base_stat} max="100" id="hp">
