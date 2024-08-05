@@ -1,7 +1,7 @@
 export default function PokemonCard({ pokemon }) {
   return (
     <div className="bg-black text-base-content flex flex-col items-center rounded-xl shadow">
-      <img src={pokemon.sprites.front_default} alt="" />
+      <img className="w-full" src={pokemon.sprites.front_default} alt="" />
       <h2 className="font-semibold text-lg">{pokemon.name}</h2>
       <div className="flex gap-2 items-center justify-between w-full px-3">
         <label for="hp">HP</label>
@@ -23,7 +23,7 @@ export default function PokemonCard({ pokemon }) {
       </div>
       <div className="flex gap-2 items-center justify-between w-full px-3 pb-3">
         <label for="defense">Speed</label>
-        <meter className="[&::-webkit-meter-optimum-value]:bg-amber-500" value={pokemon.stats[2].base_stat} max="100" id="defense">
+        <meter className="[&::-webkit-meter-optimum-value]:bg-amber-500" value={pokemon.stats[5].base_stat} max="100" id="speed">
           Defense
         </meter>
       </div>
