@@ -16,6 +16,13 @@ export default function BattlePage() {
   const [winner, setWinner] = useState("Undefined");
   const [score, setScore] = useState(JSON.parse(localStorage.getItem(scoreKey)) || { wins: 0, loses: 0 });
 
+  const [fleshPlayer, setFleshPlayer] = useState(0);
+  const [fleshEnemy, setFleshEnemy] = useState(0);
+  const [playerAttack, setPlayerAttack] = useState(false);
+  const [enemyAttack, setEnemyAttack] = useState(false);
+  const [playerWon, setPlayerWon] = useState(false);
+  const [enemyWon, setEnemyWon] = useState(false);
+
   function handleStart(e) {
     setWinner("Undefined");
     setCombatMode(true);
@@ -23,6 +30,8 @@ export default function BattlePage() {
   }
 
   function handleRetry(e) {
+    setEnemyWon(false);
+    setPlayerWon(false);
     setWinner("Undefined");
     setCombatLog([]);
     setCombatMode(true);
@@ -50,18 +59,46 @@ export default function BattlePage() {
   }, [combatInProgress]);
 
   function BattleController() {
+    const flashTime = 150;
+
     if (attacker == "player") {
       const afterAttack = attack(playerPoki, enemyPoki, "player");
       setEnemyPoki(afterAttack);
+      setFleshEnemy(flashTime);
+      setPlayerAttack(true);
+
+      const fleshInterval = setInterval(() => {
+        setFleshEnemy(0);
+        clearInterval(fleshInterval);
+      }, flashTime);
+      const attackInterval = setInterval(() => {
+        setPlayerAttack(false);
+        clearInterval(attackInterval);
+      }, flashTime);
+
       if (afterAttack.hp <= 0) {
         setScore({ ...score, wins: score.wins + 1 });
+        setPlayerWon(true);
         localStorage.setItem(scoreKey, JSON.stringify({ ...score, wins: score.wins + 1 }));
       }
       attacker = "enemy";
     } else {
       const afterAttack = attack(enemyPoki, playerPoki, "enemy");
       setPlayerPoki(afterAttack);
+      setFleshPlayer(flashTime);
+      setEnemyAttack(true);
+
+      const interval = setInterval(() => {
+        setFleshPlayer(0);
+        clearInterval(interval);
+      }, flashTime);
+      const attackInterval = setInterval(() => {
+        setEnemyAttack(false);
+        clearInterval(attackInterval);
+      }, flashTime);
+
       if (afterAttack.hp <= 0) {
+        setEnemyWon(true);
         setScore({ ...score, loses: score.loses + 1 });
         localStorage.setItem(scoreKey, JSON.stringify({ ...score, loses: score.loses + 1 }));
       }
@@ -135,10 +172,18 @@ export default function BattlePage() {
       <div className="w-1/2">
         <p className=" text-center text-3xl pt-4">Prepare for Battle!</p>
         <Popup winner={winner} />
-        <div className="flex justify-evenly gap-4 mt-12 items-center max-w-[40rem] m-auto">
-          <PokemonBattleCard pokemon={playerPoki} />
+        <div className="flex justify-evenly gap-4 mt-12 items-center max-w-[40rem] m-auto pb-4">
+          <div
+            className={`border-[2px] rounded-lg border-error border-opacity-0 transition-all duration-150 
+              ${fleshPlayer && `border-opacity-100`} ${playerAttack && `scale-110`} ${playerWon && `scale-110 border-success border-opacity-100`}`}>
+            <PokemonBattleCard pokemon={playerPoki} />
+          </div>
           <p className="text-3xl">VS</p>
-          <PokemonBattleCard pokemon={enemyPoki} />
+          <div
+            className={`border-[2px] rounded-lg border-error border-opacity-0 transition-all duration-150 
+            ${fleshEnemy && `border-opacity-100`} ${enemyAttack && `scale-110`}  ${enemyWon && `scale-110 border-success border-opacity-100`}`}>
+            <PokemonBattleCard pokemon={enemyPoki} />
+          </div>
         </div>
         {combatMode ? (
           <div className="max-w-[40rem] m-auto text-center ">
