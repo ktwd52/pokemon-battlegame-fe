@@ -23,6 +23,15 @@ export default function BattlePage() {
   const [playerWon, setPlayerWon] = useState(false);
   const [enemyWon, setEnemyWon] = useState(false);
 
+  function resetBattle() {
+    setEnemyWon(false);
+    setPlayerWon(false);
+    setWinner("Undefined");
+
+    setEnemyPoki({ ...enemyPoki, hp: enemyPoki.maxHp });
+    setCombatLog([]);
+  }
+
   function handleStart(e) {
     setWinner("Undefined");
     setCombatMode(true);
@@ -30,14 +39,10 @@ export default function BattlePage() {
   }
 
   function handleRetry(e) {
-    setEnemyWon(false);
-    setPlayerWon(false);
-    setWinner("Undefined");
-    setCombatLog([]);
+    resetBattle();
     setCombatMode(true);
     setCombatInProgress(true);
     setPlayerPoki({ ...playerPoki, hp: playerPoki.maxHp });
-    setEnemyPoki({ ...enemyPoki, hp: enemyPoki.maxHp });
   }
 
   let attacker = "player";
@@ -155,7 +160,11 @@ export default function BattlePage() {
               return (
                 <div
                   key={pokemon.name}
-                  onClick={(e) => setPlayerPoki(getBattlePoki(pokemon))}
+                  onClick={(e) => {
+                    setPlayerPoki(getBattlePoki(pokemon));
+                    setCombatMode(false);
+                    resetBattle();
+                  }}
                   className="hover:cursor-pointer border-[2px] border-opacity-25 border-accent hover:border-opacity-100 rounded-xl">
                   <PokemonCard pokemon={pokemon} />
                 </div>
@@ -174,14 +183,14 @@ export default function BattlePage() {
         <Popup winner={winner} />
         <div className="flex justify-evenly gap-4 mt-12 items-center max-w-[40rem] m-auto pb-4">
           <div
-            className={`border-[2px] rounded-lg border-error border-opacity-0 transition-all duration-150 
-              ${fleshPlayer && `border-opacity-100`} ${playerAttack && `scale-110`} ${playerWon && `scale-110 border-success border-opacity-100`}`}>
+            className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150 
+              ${fleshPlayer && `border-opacity-100`} ${playerAttack && `scale-110`} ${playerWon && `scale-125 border-success border-opacity-100`}`}>
             <PokemonBattleCard pokemon={playerPoki} />
           </div>
           <p className="text-3xl">VS</p>
           <div
-            className={`border-[2px] rounded-lg border-error border-opacity-0 transition-all duration-150 
-            ${fleshEnemy && `border-opacity-100`} ${enemyAttack && `scale-110`}  ${enemyWon && `scale-110 border-success border-opacity-100`}`}>
+            className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150 
+            ${fleshEnemy && `border-opacity-100`} ${enemyAttack && `scale-110`}  ${enemyWon && `scale-125 border-success border-opacity-100`}`}>
             <PokemonBattleCard pokemon={enemyPoki} />
           </div>
         </div>
