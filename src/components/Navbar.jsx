@@ -20,7 +20,7 @@ export default function Navbar() {
               <NavLink to="/">Pokemons </NavLink>
             </li>
             <li>
-              <NavLink to="roaster">Roaster</NavLink>
+              <NavLink to="roaster">Roster</NavLink>
             </li>
             <li>
               <NavLink to="leaderboard">Leaderboard</NavLink>
