@@ -4,10 +4,12 @@ import LogEntry from "./Battle/LogEntry";
 import PokemonBattleCard from "./Battle/PokemonBattleCard";
 import { dummyPokemon1, dummyPokemon2, roster } from "../utils/temporaryPokemons";
 import { CapitalizeFirstLetter } from "../utils/utils";
+import axios from "axios";
 
 const scoreKey = "poki-score";
 
 export default function BattlePage() {
+  const [loading, setLoading] = useState(true);
   const [playerPoki, setPlayerPoki] = useState(getBattlePoki(dummyPokemon1));
   const [enemyPoki, setEnemyPoki] = useState(getBattlePoki(dummyPokemon2));
   const [combatInProgress, setCombatInProgress] = useState(false);
@@ -15,19 +17,41 @@ export default function BattlePage() {
   const [combatLog, setCombatLog] = useState([]);
   const [winner, setWinner] = useState("Undefined");
   const [score, setScore] = useState(JSON.parse(localStorage.getItem(scoreKey)) || { wins: 0, loses: 0 });
-
   const [fleshPlayer, setFleshPlayer] = useState(0);
   const [fleshEnemy, setFleshEnemy] = useState(0);
   const [playerAttack, setPlayerAttack] = useState(false);
   const [enemyAttack, setEnemyAttack] = useState(false);
   const [playerWon, setPlayerWon] = useState(false);
   const [enemyWon, setEnemyWon] = useState(false);
+  const [newEnemy, setNewEnemy] = useState(false);
+  let requestSent = false;
+
+  useEffect(() => {
+    if (requestSent) return;
+    requestSent = true; // Prevent multiple requests
+    setLoading(true);
+    const randomPokemon = Math.floor(Math.random() * 1025) + 1;
+    axios
+      .get(`https://pokeapi.co/api/v2/pokemon/${randomPokemon}`)
+      .then((res) => {
+        // console.log(res.data);
+        setEnemyPoki(getBattlePoki(res.data));
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        setLoading(false);
+      });
+
+    return () => {
+      // requestSent = false;
+    };
+  }, [newEnemy]);
 
   function resetBattle() {
     setEnemyWon(false);
     setPlayerWon(false);
     setWinner("Undefined");
-
+    setCombatMode(false);
     setEnemyPoki({ ...enemyPoki, hp: enemyPoki.maxHp });
     setCombatLog([]);
   }
@@ -150,9 +174,9 @@ export default function BattlePage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-wrap">
       {/* Roster */}
-      <div className="w-1/4  text-center text-3xl bg-base-300 pt-4">
+      <div className="w-full md:w-1/4 text-center text-3xl bg-base-300 pt-4 ">
         <p>Your Roster</p>
         {!combatInProgress ? (
           <div className="grid grid-cols-3 text-xs gap-4 px-2 py-4">
@@ -178,8 +202,8 @@ export default function BattlePage() {
         )}
       </div>
       {/* Battle Section */}
-      <div className="w-1/2">
-        <p className=" text-center text-3xl pt-4">Prepare for Battle!</p>
+      <div className="w-full md:w-1/2">
+        <p className="text-center text-3xl pt-4">Prepare for Battle!</p>
         <Popup winner={winner} />
         <div className="flex justify-evenly gap-4 mt-12 items-center max-w-[40rem] m-auto pb-4">
           <div
@@ -188,11 +212,17 @@ export default function BattlePage() {
             <PokemonBattleCard pokemon={playerPoki} />
           </div>
           <p className="text-3xl">VS</p>
-          <div
-            className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150 
+          {!loading ? (
+            <div
+              className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150 min-h-[20rem] min-w-[12rem]
             ${fleshEnemy && `border-opacity-100`} ${enemyAttack && `scale-110`}  ${enemyWon && `scale-125 border-success border-opacity-100`}`}>
-            <PokemonBattleCard pokemon={enemyPoki} />
-          </div>
+              <PokemonBattleCard pokemon={enemyPoki} />
+            </div>
+          ) : (
+            <div>
+              <div className="skeleton bg-primary rounded-xl h-[20rem] w-[12rem]"></div>
+            </div>
+          )}
         </div>
         {combatMode ? (
           <div className="max-w-[40rem] m-auto text-center ">
@@ -202,9 +232,20 @@ export default function BattlePage() {
               <div className="bg-error text-error-content font-semibold px-4 mt-4 text-xl flex justify-between items-center">
                 <div className="text-xl">{CapitalizeFirstLetter(winner)} has won!</div>
                 {!combatInProgress && (
-                  <button onClick={handleRetry} className="btn btn-outline btn-base my-4">
-                    Try again
-                  </button>
+                  <div className="flex gap-3">
+                    <button onClick={handleRetry} className="btn btn-outline btn-base my-4">
+                      Try again
+                    </button>
+                    <button
+                      onClick={() => {
+                        resetBattle();
+                        setPlayerPoki({ ...playerPoki, hp: playerPoki.maxHp });
+                        setNewEnemy(!newEnemy);
+                      }}
+                      className={`btn btn-outline btn-neutral my-4`}>
+                      Find Opponent
+                    </button>
+                  </div>
                 )}
               </div>
             )}
@@ -217,15 +258,23 @@ export default function BattlePage() {
             </div>
           </div>
         ) : (
-          <div className="max-w-[60rem] m-auto text-center">
+          <div className="max-w-[60rem] m-auto text-center flex justify-around">
             <button onClick={handleStart} className="btn btn-outline btn-accent my-4 btn-lg">
               Start Battle!
+            </button>
+            <button
+              onClick={() => {
+                resetBattle();
+                setNewEnemy(!newEnemy);
+              }}
+              className={`btn btn-outline btn-neutral btn-lg my-4`}>
+              Find Opponent
             </button>
           </div>
         )}
       </div>
       {/* Score Section */}
-      <div className="w-1/4 text-center text-3xl bg-base-300 pt-4">
+      <div className="w-full md:w-1/4 text-center text-3xl bg-base-300 pt-4">
         <p>Your Score</p>
         <div className="mt-16 flex justify-around items-center text-2xl">
           <p>Wins: {score.wins}</p>
