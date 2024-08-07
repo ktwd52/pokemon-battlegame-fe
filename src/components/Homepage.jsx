@@ -12,7 +12,10 @@ import { saveRoster } from "../utils/storage";
 
 const dummyPokemon = {
   name: "bulbasaur",
-  sprites: { front_default: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" },
+  sprites: {
+    front_default:
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+  },
   stats: [
     {
       base_stat: 45,
