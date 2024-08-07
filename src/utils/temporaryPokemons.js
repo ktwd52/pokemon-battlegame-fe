@@ -121,7 +121,7 @@ export const dummyPokemon2 = {
   ],
 };
 
-export const roster = [
+export const dummyRoster = [
   {
     name: "beedrill",
     sprites: {
