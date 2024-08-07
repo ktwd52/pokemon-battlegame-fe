@@ -1,10 +1,15 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const PokemonContext = createContext();
+import { getRoster } from "../../utils/storage";
 
-import { dummyRoster } from "../../utils/temporaryPokemons";
+// import { dummyRoster } from "../../utils/temporaryPokemons";
 export const PokemonProvider = ({ children }) => {
-  const [roster, setRoster] = useState(dummyRoster);
+  const [roster, setRoster] = useState([]);
+
+  useEffect(() => {
+    setRoster(getRoster());
+  }, []);
 
   return (
     <PokemonContext.Provider

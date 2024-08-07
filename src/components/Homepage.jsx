@@ -4,6 +4,11 @@ import { useState, useEffect, useContext } from "react";
 import LoadingSpinner from "./LoadingSpinner";
 import { CapitalizeFirstLetter } from "../utils/utils";
 import { NavLink } from "react-router-dom";
+import heartIcon from "../assets/heart-icon.svg";
+import heartIconSelected from "../assets/heart-icon-selected.svg";
+import { PokemonContext } from "./context/PokemonContext";
+// import PokemonBattleCard from "./Battle/PokemonBattleCard";
+import { saveRoster } from "../utils/storage";
 
 const dummyPokemon = {
   name: "bulbasaur",
@@ -61,6 +66,7 @@ const dummyPokemon = {
 };
 
 export default function HomePage() {
+  const { roster, setRoster } = useContext(PokemonContext);
   const [limit, setLimit] = useState(18);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -88,7 +94,7 @@ export default function HomePage() {
   }, [url]);
 
   return (
-    <div className="min-h-screen text-center bg-base-100 max-w-[70rem] m-auto">
+    <div className="min-h-screen text-center bg-base-100 max-w-[70rem] m-auto ">
       {/* <p className="text-3xl my-3">Pokemons</p> */}
       <div className="m-auto my-4">
         <Pagination nextPage={nextPage} prevPage={prevPage} setUrl={setUrl} />
@@ -98,7 +104,7 @@ export default function HomePage() {
           <LoadingSpinner />
         </div>
       ) : (
-        <div className="grid grid-cols-6 gap-4 pb-12">
+        <div className="grid grid-cols-6 gap-4 pb-12 relative">
           {pokemons.map((pokemon) => {
             return (
               // <div
@@ -106,12 +112,7 @@ export default function HomePage() {
               //   key={pokemon.name}>
               //   {CapitalizeFirstLetter(pokemon.name)}
               // </div>
-              <NavLink
-                to={`pokemon/${pokemon.url.split("/")[6]}`}
-                key={pokemon.name}
-                className="hover:cursor-pointer hover:border-opacity-100 border-opacity-0 border-[2px] border-accent rounded-xl">
-                <PokemonBase pokemonBase={pokemon} />
-              </NavLink>
+              <HomePokemonCard key={pokemon.name} roster={roster} setRoster={setRoster} pokemon={pokemon} />
             );
           })}
         </div>
@@ -160,6 +161,46 @@ const Pagination = ({ nextPage, prevPage, setUrl }) => {
           </button>
         )}
       </div>
+    </div>
+  );
+};
+
+const HomePokemonCard = ({ pokemon, roster, setRoster }) => {
+  const [inRoster, setInRoster] = useState(false);
+
+  useEffect(() => {
+    const found = roster.find((x) => x.name === pokemon.name);
+    if (found) setInRoster(true);
+    else setInRoster(false);
+  }, []);
+
+  return (
+    <div key={pokemon.name} className="relative hover:cursor-pointer hover:border-opacity-100 border-opacity-0 border-[2px] border-accent rounded-xl">
+      <img
+        onClick={() => {
+          if (!inRoster) {
+            setInRoster(true);
+            axios
+              .get(pokemon.url)
+              .then((res) => {
+                setRoster([...roster, res.data]);
+                saveRoster([...roster, res.data]);
+              })
+              .catch((err) => console.log(err));
+          } else {
+            const r = roster.filter((x) => x.name !== pokemon.name);
+            setRoster(r);
+            saveRoster(r);
+            setInRoster(false);
+          }
+        }}
+        className="absolute right-2 top-2 opacity-80 hover:cursor-pointer hover:animate-pulse"
+        src={inRoster ? heartIconSelected : heartIcon}
+        alt=""
+      />
+      <NavLink to={`pokemon/${pokemon.url.split("/")[6]}`} className="">
+        <PokemonBase pokemonBase={pokemon} />
+      </NavLink>
     </div>
   );
 };
