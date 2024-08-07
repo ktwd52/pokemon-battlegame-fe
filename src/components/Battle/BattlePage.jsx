@@ -1,14 +1,16 @@
-import PokemonCard from "./PokemonCard";
-import { useState, useEffect } from "react";
-import LogEntry from "./Battle/LogEntry";
-import PokemonBattleCard from "./Battle/PokemonBattleCard";
-import { dummyPokemon1, dummyPokemon2, roster } from "../utils/temporaryPokemons";
-import { CapitalizeFirstLetter } from "../utils/utils";
+import PokemonCard from "../PokemonCard";
+import { useState, useEffect, useContext } from "react";
+import LogEntry from "./LogEntry";
+import PokemonBattleCard from "./PokemonBattleCard";
+import { dummyPokemon1, dummyPokemon2 } from "../../utils/temporaryPokemons";
+import { CapitalizeFirstLetter } from "../../utils/utils";
+import { PokemonContext } from "../context/PokemonContext";
 import axios from "axios";
 
 const scoreKey = "poki-score";
 
 export default function BattlePage() {
+  const { roster } = useContext(PokemonContext);
   const [loading, setLoading] = useState(true);
   const [playerPoki, setPlayerPoki] = useState(getBattlePoki(dummyPokemon1));
   const [enemyPoki, setEnemyPoki] = useState(getBattlePoki(dummyPokemon2));
