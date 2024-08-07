@@ -7,25 +7,25 @@ const PokemonBattleCard = ({ pokemon }) => {
       <h2 className="font-semibold text-lg">{CapitalizeFirstLetter(pokemon.name)}</h2>
       <div className="flex gap-2 items-center justify-between w-full px-3">
         <label htmlFor="hp">HP</label>
-        <meter className="duration-500 transition-all" value={pokemon.hp} max="150" id="hp">
+        <meter className="duration-500 transition-all" value={pokemon.hp} max="200" id="hp">
           HP
         </meter>
       </div>
       <div className="flex gap-2 items-center justify-between w-full px-3">
         <label htmlFor="attack">Attack</label>
-        <meter className="[&::-webkit-meter-optimum-value]:bg-red-500" value={pokemon.atk} max="150" id="attack">
+        <meter className="[&::-webkit-meter-optimum-value]:bg-red-500" value={pokemon.atk} max="200" id="attack">
           Attack
         </meter>
       </div>
       <div className="flex gap-2 items-center justify-between w-full px-3">
         <label htmlFor="defense">Defense</label>
-        <meter className="[&::-webkit-meter-optimum-value]:bg-blue-500" value={pokemon.def} max="150" id="defense">
+        <meter className="[&::-webkit-meter-optimum-value]:bg-blue-500" value={pokemon.def} max="200" id="defense">
           Defense
         </meter>
       </div>
       <div className="flex gap-2 items-center justify-between w-full px-3 pb-3">
         <label htmlFor="defense">Speed</label>
-        <meter className="[&::-webkit-meter-optimum-value]:bg-amber-500" value={pokemon.spd} max="150" id="speed">
+        <meter className="[&::-webkit-meter-optimum-value]:bg-amber-500" value={pokemon.spd} max="200" id="speed">
           Defense
         </meter>
       </div>

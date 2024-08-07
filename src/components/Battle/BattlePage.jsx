@@ -6,10 +6,17 @@ import { dummyPokemon1, dummyPokemon2 } from "../../utils/temporaryPokemons";
 import { CapitalizeFirstLetter } from "../../utils/utils";
 import { PokemonContext } from "../context/PokemonContext";
 import axios from "axios";
+import serverConfig from "../../utils/serverConfig";
+import { saveUsername, loadUsername } from "../../utils/storage";
 
 const scoreKey = "poki-score";
 
 export default function BattlePage() {
+  const postToLeaderboard = `${serverConfig.serverUri}:${serverConfig.serverPort}/leaderboard`;
+  // console.log(postToLeaderboard);
+  const [userName, setUserName] = useState(loadUsername());
+  const [newUsername, setNewUsername] = useState(userName);
+  const [editName, setEditName] = useState(false);
   const { roster } = useContext(PokemonContext);
   const [loading, setLoading] = useState(true);
   const [playerPoki, setPlayerPoki] = useState(getBattlePoki(dummyPokemon1));
@@ -108,9 +115,11 @@ export default function BattlePage() {
       }, flashTime);
 
       if (afterAttack.hp <= 0) {
-        setScore({ ...score, wins: score.wins + 1 });
+        const _score = { ...score, wins: score.wins + 1 };
+        setScore(_score);
         setPlayerWon(true);
-        localStorage.setItem(scoreKey, JSON.stringify({ ...score, wins: score.wins + 1 }));
+        localStorage.setItem(scoreKey, JSON.stringify(_score));
+        EndGame(_score);
       }
       attacker = "enemy";
     } else {
@@ -130,11 +139,18 @@ export default function BattlePage() {
 
       if (afterAttack.hp <= 0) {
         setEnemyWon(true);
-        setScore({ ...score, loses: score.loses + 1 });
-        localStorage.setItem(scoreKey, JSON.stringify({ ...score, loses: score.loses + 1 }));
+        const _score = { ...score, loses: score.loses + 1 };
+        setScore(_score);
+        localStorage.setItem(scoreKey, JSON.stringify(_score));
+        EndGame(_score);
       }
       attacker = "player";
     }
+  }
+
+  function EndGame(_score) {
+    const body = { username: userName, wins: _score.wins, losses: _score.loses };
+    axios.post(postToLeaderboard, body).catch((err) => console.log(err));
   }
 
   function attack(attacker, defender, attackerText) {
@@ -175,10 +191,14 @@ export default function BattlePage() {
     };
   }
 
+  function handleUsernameChange(e) {
+    setNewUsername(e.target.value);
+  }
+
   return (
-    <div className="min-h-screen flex flex-wrap">
+    <div className="min-h-screen flex flex-wrap bg">
       {/* Roster */}
-      <div className="w-full md:w-1/4 text-center text-3xl bg-base-300 pt-4 ">
+      <div className="w-full md:w-1/3 text-center text-3xl bg-base-300 pt-4 ">
         <p>Your Roster</p>
         {!combatInProgress ? (
           <div className="grid grid-cols-3 text-xs gap-4 px-2 py-4">
@@ -204,10 +224,59 @@ export default function BattlePage() {
         )}
       </div>
       {/* Battle Section */}
-      <div className="w-full md:w-1/2">
-        <p className="text-center text-3xl pt-4">Prepare for Battle!</p>
+      <div className="w-full md:w-2/3">
+        {/* Score Section */}
+        <div className="w-full text-center text-3xl bg-base-300 py-4">
+          <div className="">
+            {!editName ? (
+              <div className="flex justify-center items-center gap-4">
+                <p> {userName}</p>
+                {!combatInProgress && (
+                  <button
+                    className="btn btn-outline btn-warning btn-sm"
+                    onClick={() => {
+                      setNewUsername(userName);
+                      setEditName(true);
+                    }}>
+                    Change Name
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="flex justify-center items-center gap-4">
+                <input
+                  onChange={handleUsernameChange}
+                  value={newUsername}
+                  type="text"
+                  placeholder="Enter Username"
+                  className="input input-bordered w-full max-w-xs"
+                />
+                <button
+                  className="btn btn-outline btn-success btn-sm"
+                  onClick={() => {
+                    setEditName(false);
+                    if (newUsername !== userName) {
+                      setScore({ wins: 0, loses: 0 });
+                      saveUsername(newUsername);
+                    }
+                    setUserName(newUsername);
+                  }}>
+                  Confirm
+                </button>
+                <button onClick={() => setEditName(false)} className="btn btn-outline btn-neutral btn-sm">
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="mt-4 flex justify-around items-center text-2xl ">
+            <p className="font-semibold">Wins: {score.wins}</p>
+            <p className="font-semibold">Loses: {score.loses}</p>
+          </div>
+        </div>
+        <p className="text-center text-3xl py-4">Prepare for Battle!</p>
         <Popup winner={winner} />
-        <div className="flex justify-evenly gap-4 mt-12 items-center max-w-[40rem] m-auto pb-4">
+        <div className="flex justify-evenly gap-4 mt-6 items-center max-w-[40rem] m-auto pb-4">
           <div
             className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150 
               ${fleshPlayer && `border-opacity-100`} ${playerAttack && `scale-110`} ${playerWon && `scale-125 border-success border-opacity-100`}`}>
@@ -274,14 +343,6 @@ export default function BattlePage() {
             </button>
           </div>
         )}
-      </div>
-      {/* Score Section */}
-      <div className="w-full md:w-1/4 text-center text-3xl bg-base-300 pt-4">
-        <p>Your Score</p>
-        <div className="mt-16 flex justify-around items-center text-2xl">
-          <p>Wins: {score.wins}</p>
-          <p>Loses: {score.loses}</p>
-        </div>
       </div>
     </div>
   );
