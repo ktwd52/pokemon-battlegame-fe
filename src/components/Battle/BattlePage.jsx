@@ -201,7 +201,7 @@ export default function BattlePage() {
       <div className="w-full md:w-1/3 text-center text-3xl bg-base-300 pt-4 ">
         <p>Your Roster</p>
         {!combatInProgress ? (
-          <div className="grid grid-cols-3 text-xs gap-4 px-2 py-4">
+          <div className="grid grid-cols-4 text-xs gap-4 px-2 py-4">
             {roster.map((pokemon) => {
               return (
                 <div
