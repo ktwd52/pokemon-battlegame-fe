@@ -3,16 +3,19 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Homepage from "./components/Homepage";
 import LeaderboardPage from "./components/LeaderboardPage";
-import BattlePage from "./components/BattlePage";
-import MyRoasterPage from "./components/MyRosterPage";
+import BattlePage from "./components/Battle/BattlePage";
+import MyRosterPage from "./components/MyRosterPage";
 import PokemonDetailsPage from "./components/PokemonDetailsPage";
 import PageNotFound from "./components/PageNotFound";
+import { PokemonProvider } from "./components/context/PokemonContext";
 
 const MainLayout = () => {
   return (
     <>
       <Navbar />
-      <Outlet />
+      <PokemonProvider>
+        <Outlet />
+      </PokemonProvider>
       <Footer />
     </>
   );
@@ -24,8 +27,8 @@ const router = createBrowserRouter(
       <Route index element={<Homepage />}></Route>
       <Route path="leaderboard" element={<LeaderboardPage />}></Route>
       <Route path="battle" element={<BattlePage />}></Route>
-      <Route path="roaster" element={<MyRoasterPage />}></Route>
-      <Route path="details/:id" element={<PokemonDetailsPage />}></Route>
+      <Route path="roster" element={<MyRosterPage />}></Route>
+      <Route path="pokemon/:id" element={<PokemonDetailsPage />}></Route>
       <Route path="*" element={<PageNotFound />} />
     </Route>
   )
