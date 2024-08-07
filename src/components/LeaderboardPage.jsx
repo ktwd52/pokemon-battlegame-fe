@@ -28,7 +28,7 @@ export default function LeaderboardPage() {
     return <div>Error: {error.message}</div>;
   }
   // Sort the leaderboard by wins in descending order
-  const sortedLeaderboard = leaderboard.sort((a, b) => b.wins - a.wins);
+  const sortedLeaderboard = leaderboard.sort((a, b) => b.score - a.score);
 
   return (
     <div className="min-h-screen text-center bg-base-100">
@@ -47,6 +47,9 @@ export default function LeaderboardPage() {
                   Username
                 </th>
                 <th scope="col" className="border-separate">
+                  Score
+                </th>
+                <th scope="col" className="border-separate">
                   Wins
                 </th>
                 <th scope="col" className="border-separate">
@@ -59,7 +62,7 @@ export default function LeaderboardPage() {
             </thead>
             <tbody>
               {sortedLeaderboard.map(
-                ({ _id, username, wins, losses, createdAt }, index) => {
+                ({ _id, username, score, wins, losses, createdAt }, index) => {
                   const date = new Date(createdAt);
                   const mmyyyyDate = `${String(date.getMonth() + 1).padStart(
                     2,
@@ -71,6 +74,7 @@ export default function LeaderboardPage() {
                       <td className="text-left">
                         {username + " (" + _id + ")"}
                       </td>
+                      <td>{score}</td>
                       <td>{wins}</td>
                       <td>{losses}</td>
                       <td>{mmyyyyDate}</td>
