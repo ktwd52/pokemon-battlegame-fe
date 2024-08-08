@@ -20,12 +20,8 @@ export default function LeaderboardPage() {
       });
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div>Error during fetching the data: {error.message}</div>;
   }
   // Sort the leaderboard by wins in descending order
   const sortedLeaderboard = leaderboard.sort((a, b) => b.score - a.score);
@@ -34,10 +30,11 @@ export default function LeaderboardPage() {
     <div className="min-h-screen text-center bg-base-100">
       <div className="m-auto my-4 align-middle"></div>
       {loading ? (
-        <div>{/* <LoadingSpinner /> */}</div>
+        <div>Loading the results...</div>
       ) : (
         <div>
-          <table className="ml-[30rem] border-separate border-spacing-[32px] md: border-spacing-[24px] xs:border-spacing-[12px] border-[5px] border-slate-200	table-fixed align-middle font-bold text-[1.5rem]">
+          <h2 className="text-3xl py-4">High Score Table</h2>
+          <table className="ml-[30rem] border-separate border-spacing-[32px] border-[5px] border-slate-200	table-fixed align-middle font-bold text-[1.5rem]">
             <thead>
               <tr>
                 <th scope="col" className="border-separate">
@@ -56,7 +53,7 @@ export default function LeaderboardPage() {
                   Losses
                 </th>
                 <th scope="col" className="border-separate">
-                  Ranked since
+                  First Ranked
                 </th>
               </tr>
             </thead>
@@ -64,7 +61,7 @@ export default function LeaderboardPage() {
               {sortedLeaderboard.map(
                 ({ _id, username, score, wins, losses, createdAt }, index) => {
                   const date = new Date(createdAt);
-                  const mmyyyyDate = `${String(date.getMonth() + 1).padStart(
+                  const firstRanked = `${String(date.getMonth() + 1).padStart(
                     2,
                     "0"
                   )}/${date.getFullYear()}`;
@@ -72,12 +69,12 @@ export default function LeaderboardPage() {
                     <tr key={username}>
                       <td>{index + 1}</td>
                       <td className="text-left">
-                        {username + " (" + _id + ")"}
+                        {username + " [" + _id + "]"}
                       </td>
                       <td>{score}</td>
                       <td>{wins}</td>
                       <td>{losses}</td>
-                      <td>{mmyyyyDate}</td>
+                      <td>{firstRanked}</td>
                     </tr>
                   );
                 }
