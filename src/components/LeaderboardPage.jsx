@@ -8,8 +8,11 @@ export default function LeaderboardPage() {
   // console.log("before useeffect");
   useEffect(() => {
     // console.log("before axios within useeffect");
+    const url = `${import.meta.env.VITE_SERVER_URI}:${
+      import.meta.env.VITE_SERVER_PORT
+    }/leaderboard`;
     axios
-      .get(`http://localhost:8000/leaderboard`)
+      .get(url)
       .then((res) => {
         console.log(res.data);
         setLeaderboard(res.data);
@@ -17,6 +20,7 @@ export default function LeaderboardPage() {
       .catch((err) => console.log(err))
       .finally(() => {
         setLoading(false);
+        npm;
       });
   }, []);
 
