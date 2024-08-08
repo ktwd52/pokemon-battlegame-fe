@@ -39,35 +39,38 @@ export default function LeaderboardPage() {
       {loading ? (
         <div>Loading the results...</div>
       ) : (
-        <div>
+        <div className="relative table-fixed">
           <h2 className="text-3xl py-4">High Score Table</h2>
-          <table className="m-auto border-separate border-spacing-[32px] border-[5px] border-slate-200	table-fixed align-middle font-bold text-[1.5rem]">
-            <thead className="bg-[#1c4e80] border-b sticky top-0 text-[#cfdae6]">
+          <table className="text-center w-auto text-m text-gray-500 dark:text-gray-400 m-auto border-separate border-spacing-[12px] border-[8px] border-slate-200	 align-middle font-bold text-[1.5rem]">
+            <thead className="uppercase dark:bg-gray-700 dark:text-gray-400 bg-[#1c4e80] border-b sticky top-0 text-[#cfdae6] align-middle">
               <tr>
-                <th scope="col" className="border-separate">
+                <th scope="col" className="px-6 py-3">
                   Ranking
                 </th>
-                <th scope="col" className="border-separate">
+                <th scope="col" className="px-6 py-3">
+                  [Id]
+                </th>
+                <th scope="col" className="px-6 py-3">
                   Username
                 </th>
-                <th scope="col" className="border-separate">
+                <th scope="col" className="px-6 py-3">
                   Playing since
                 </th>
-                <th scope="col" className="border-separate">
+                <th scope="col" className="px-6 py-3">
                   Score
                 </th>
-                <th scope="col" className="border-separate">
+                <th scope="col" className="px-6 py-3">
                   Wins
                 </th>
-                <th scope="col" className="border-separate">
+                <th scope="col" className="px-6 py-3">
                   Losses
                 </th>
-                <th scope="col" className="border-separate">
+                <th scope="col" className="px-6 py-3">
                   Last game played
                 </th>
               </tr>
             </thead>
-            <tbody className="h-96 overflow-y-auto">
+            <tbody className="align-middle">
               {sortedLeaderboard.map(
                 (
                   { _id, username, score, wins, losses, createdAt, updatedAt },
@@ -79,16 +82,34 @@ export default function LeaderboardPage() {
                   ).padStart(2, "0")}`;
 
                   return (
-                    <tr key={username}>
-                      <td>{index + 1}</td>
-                      <td className="text-left">
-                        {username + " - id[" + _id + "]"}
+                    <tr
+                      key={username}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                    >
+                      <th
+                        scope="row"
+                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white "
+                      >
+                        {index + 1}
+                      </th>
+                      <td scope="row">[{_id}]</td>
+                      <td scope="row">{username}</td>
+                      <td scope="row" className="px-6 py-4">
+                        {playingSince}
                       </td>
-                      <td>{playingSince}</td>
-                      <td>{score}</td>
-                      <td>{wins}</td>
-                      <td>{losses}</td>
-                      <td>{new Date(updatedAt).toLocaleDateString("us-US")}</td>
+                      <td scope="row" className="px-6 py-4">
+                        {score}
+                      </td>
+                      <td scope="row" className="px-6 py-4">
+                        {wins}
+                      </td>
+                      <td scope="row" className="px-6 py-4">
+                        {losses}
+                      </td>
+                      <td scope="row" className="px-6 py-4">
+                        {" "}
+                        {new Date(updatedAt).toLocaleDateString("us-US")}
+                      </td>
                     </tr>
                   );
                 }
