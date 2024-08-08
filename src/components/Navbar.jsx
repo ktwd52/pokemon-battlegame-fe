@@ -10,7 +10,12 @@ export default function Navbar() {
     <div className="bg-primary text-primary-content">
       <div className="navbar  max-w-[60rem] m-auto">
         <div className="flex-1 ">
-          <NavLink to="battle" className={({ isActive }) => (isActive ? "bg-base-300 text-base-content" : "")}>
+          <NavLink
+            to="battle"
+            className={({ isActive }) =>
+              isActive ? "bg-base-300 text-base-content" : ""
+            }
+          >
             <p className="btn btn-ghost text-xl">To Battle!</p>
           </NavLink>
         </div>
