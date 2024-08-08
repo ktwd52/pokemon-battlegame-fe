@@ -23,8 +23,14 @@ export default function LeaderboardPage() {
   if (error) {
     return <div>Error during fetching the data: {error.message}</div>;
   }
-  // Sort the leaderboard by wins in descending order
-  const sortedLeaderboard = leaderboard.sort((a, b) => b.score - a.score);
+
+  // Sort the leaderboard by score in descending order, then by createdAt in descending order
+  const sortedLeaderboard = leaderboard.sort((a, b) => {
+    if (b.score === a.score) {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    return b.score - a.score;
+  });
 
   return (
     <div className="min-h-screen text-center bg-base-100">
