@@ -14,13 +14,13 @@ export default function MyRosterPage() {
         {roster &&
           roster.map((pokemon) => {
             return (
-              <div className="hover:cursor-pointer border-[2px] rounded-xl border-primary hover:border-accent relative">
+              <div key={pokemon.name} className="hover:cursor-pointer border-[2px] rounded-xl border-primary hover:border-accent relative">
                 <button
                   onClick={(e) => setRoster(roster.filter((x) => x.name !== pokemon.name))}
                   className="absolute btn btn-outline btn-error right-0  rounded-tr-lg btn-xs border-[1px]">
                   ✕
                 </button>
-                <NavLink to={`/pokemon/${pokemon.id}`} key={pokemon.name} className="">
+                <NavLink to={`/pokemon/${pokemon.id}`} className="">
                   <PokemonCard pokemon={pokemon} />
                 </NavLink>
               </div>
