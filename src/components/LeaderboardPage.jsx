@@ -5,16 +5,14 @@ export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // console.log("before useeffect");
+
   useEffect(() => {
-    // console.log("before axios within useeffect");
     const url = `${import.meta.env.VITE_SERVER_URI}:${
       import.meta.env.VITE_SERVER_PORT
     }/leaderboard`;
     axios
       .get(url)
       .then((res) => {
-        console.log(res.data);
         setLeaderboard(res.data);
       })
       .catch((err) => console.log(err))
@@ -30,9 +28,9 @@ export default function LeaderboardPage() {
   // Sort the leaderboard by score in descending order, then by createdAt in descending order
   const sortedLeaderboard = leaderboard.sort((a, b) => {
     if (b.score === a.score) {
-      return new Date(a.createdAt) - new Date(b.createdAt);
+      return b.wins - a.wins; // Sort by wins in descending order
     }
-    return b.score - a.score;
+    return b.score - a.score; // Sort by score in descending order
   });
 
   return (
@@ -43,14 +41,17 @@ export default function LeaderboardPage() {
       ) : (
         <div>
           <h2 className="text-3xl py-4">High Score Table</h2>
-          <table className="ml-[30rem] border-separate border-spacing-[32px] border-[5px] border-slate-200	table-fixed align-middle font-bold text-[1.5rem]">
-            <thead>
+          <table className="m-auto border-separate border-spacing-[32px] border-[5px] border-slate-200	table-fixed align-middle font-bold text-[1.5rem]">
+            <thead className="bg-[#1c4e80] border-b sticky top-0 text-[#cfdae6]">
               <tr>
                 <th scope="col" className="border-separate">
                   Ranking
                 </th>
                 <th scope="col" className="border-separate">
                   Username
+                </th>
+                <th scope="col" className="border-separate">
+                  Playing since
                 </th>
                 <th scope="col" className="border-separate">
                   Score
@@ -62,28 +63,32 @@ export default function LeaderboardPage() {
                   Losses
                 </th>
                 <th scope="col" className="border-separate">
-                  First Ranked
+                  Last game played
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="h-96 overflow-y-auto">
               {sortedLeaderboard.map(
-                ({ _id, username, score, wins, losses, createdAt }, index) => {
+                (
+                  { _id, username, score, wins, losses, createdAt, updatedAt },
+                  index
+                ) => {
                   const date = new Date(createdAt);
-                  const firstRanked = `${String(date.getMonth() + 1).padStart(
-                    2,
-                    "0"
-                  )}/${date.getFullYear()}`;
+                  const playingSince = `${date.getFullYear()}/${String(
+                    date.getMonth() + 1
+                  ).padStart(2, "0")}`;
+
                   return (
                     <tr key={username}>
                       <td>{index + 1}</td>
                       <td className="text-left">
-                        {username + " [" + _id + "]"}
+                        {username + " - id[" + _id + "]"}
                       </td>
+                      <td>{playingSince}</td>
                       <td>{score}</td>
                       <td>{wins}</td>
                       <td>{losses}</td>
-                      <td>{firstRanked}</td>
+                      <td>{new Date(updatedAt).toLocaleDateString("us-US")}</td>
                     </tr>
                   );
                 }
