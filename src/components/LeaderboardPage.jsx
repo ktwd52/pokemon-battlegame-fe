@@ -51,9 +51,7 @@ export default function LeaderboardPage() {
         <div className="relative table-fixed">
           <div className="flex gap-4 items-center justify-center">
             <h2 className="text-3xl py-4">
-              {isChecked
-                ? "High Score Table (simple)"
-                : "High Score Table (extended)"}
+              {isChecked ? "High Score Table" : "High Score Table (extended)"}
             </h2>
             <input
               type="checkbox"
@@ -64,8 +62,8 @@ export default function LeaderboardPage() {
             />
           </div>
           {isChecked ? (
-            <table className="text-center w-auto text-m text-gray-500 dark:text-gray-400 m-auto border-separate border-spacing-[12px] border-[8px] border-slate-200 align-middle font-bold text-[1.5rem]">
-              <thead className="uppercase dark:bg-gray-700 dark:text-gray-400 bg-[#1c4e80] border-b sticky top-0 text-[#cfdae6] align-middle">
+            <table className="text-center w-auto text-m text-gray-500 dark:text-gray-400 m-auto border-separate border-spacing-[12px] border-[8px] border-[#1c4e80] mb-4 align-middle font-bold text-[1.5rem]">
+              <thead className="uppercase dark:bg-gray-700 dark:text-gray-400 bg-[#1c4e80] border-b sticky top-0 text-[#cfd9e3] align-middle">
                 <tr>
                   <th scope="col" className="px-6 py-3">
                     Ranking
@@ -83,11 +81,11 @@ export default function LeaderboardPage() {
                   return (
                     <tr
                       key={username}
-                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                      className="bg-black border-b border-[#1c4e80] dark:bg-gray-800 dark:border-gray-700"
                     >
                       <th
                         scope="row"
-                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                        className="px-6 py-4 font-medium whitespace-nowrap dark:text-white"
                       >
                         {index + 1}
                       </th>
@@ -99,8 +97,8 @@ export default function LeaderboardPage() {
               </tbody>
             </table>
           ) : (
-            <table className="text-center w-auto text-m text-gray-500 dark:text-gray-400 m-auto border-separate border-spacing-[12px] border-[8px] border-slate-200 align-middle font-bold text-[1.5rem]">
-              <thead className="uppercase dark:bg-gray-700 dark:text-gray-400 bg-[#1c4e80] border-b sticky top-0 text-[#cfdae6] align-middle">
+            <table className="text-center w-auto text-m text-gray-500 dark:text-gray-400 m-auto border-separate border-spacing-[12px] border-[8px] border-[#1c4e80] mb-4 align-middle font-bold text-[1.5rem]">
+              <thead className="uppercase dark:bg-gray-700 dark:text-gray-400 bg-[#1c4e80] border-b sticky top-0 text-[#cfd9e3] align-middle">
                 <tr>
                   <th scope="col" className="px-6 py-3">
                     Ranking
@@ -150,11 +148,11 @@ export default function LeaderboardPage() {
                     return (
                       <tr
                         key={username}
-                        className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                        className="bg-black border-b border-[#1c4e80] dark:bg-gray-800 dark:border-gray-700"
                       >
                         <th
                           scope="row"
-                          className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                          className="px-6 py-4 font-medium whitespace-nowrap dark:text-white"
                         >
                           {index + 1}
                         </th>
