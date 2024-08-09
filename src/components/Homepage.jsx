@@ -7,66 +7,7 @@ import { NavLink } from "react-router-dom";
 import heartIcon from "../assets/heart-icon.svg";
 import heartIconSelected from "../assets/heart-icon-selected.svg";
 import { PokemonContext } from "./context/PokemonContext";
-// import PokemonBattleCard from "./Battle/PokemonBattleCard";
 import { saveRoster } from "../utils/storage";
-
-const dummyPokemon = {
-  name: "bulbasaur",
-  sprites: {
-    front_default:
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-  },
-  stats: [
-    {
-      base_stat: 45,
-      effort: 0,
-      stat: {
-        name: "hp",
-        url: "https://pokeapi.co/api/v2/stat/1/",
-      },
-    },
-    {
-      base_stat: 49,
-      effort: 0,
-      stat: {
-        name: "attack",
-        url: "https://pokeapi.co/api/v2/stat/2/",
-      },
-    },
-    {
-      base_stat: 49,
-      effort: 0,
-      stat: {
-        name: "defense",
-        url: "https://pokeapi.co/api/v2/stat/3/",
-      },
-    },
-    {
-      base_stat: 65,
-      effort: 1,
-      stat: {
-        name: "special-attack",
-        url: "https://pokeapi.co/api/v2/stat/4/",
-      },
-    },
-    {
-      base_stat: 65,
-      effort: 0,
-      stat: {
-        name: "special-defense",
-        url: "https://pokeapi.co/api/v2/stat/5/",
-      },
-    },
-    {
-      base_stat: 45,
-      effort: 0,
-      stat: {
-        name: "speed",
-        url: "https://pokeapi.co/api/v2/stat/6/",
-      },
-    },
-  ],
-};
 
 export default function HomePage() {
   const { roster, setRoster } = useContext(PokemonContext);
@@ -170,6 +111,7 @@ const Pagination = ({ nextPage, prevPage, setUrl }) => {
 
 const HomePokemonCard = ({ pokemon, roster, setRoster }) => {
   const [inRoster, setInRoster] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
     const found = roster.find((x) => x.name === pokemon.name);
@@ -178,7 +120,11 @@ const HomePokemonCard = ({ pokemon, roster, setRoster }) => {
   }, []);
 
   return (
-    <div key={pokemon.name} className="relative hover:cursor-pointer hover:border-opacity-100 border-opacity-0 border-[2px] border-accent rounded-xl">
+    <div
+      key={pokemon.name}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative hover:cursor-pointer hover:border-opacity-100 border-opacity-0 border-[2px] border-accent rounded-xl">
       <img
         onClick={() => {
           if (!inRoster) {
@@ -197,7 +143,9 @@ const HomePokemonCard = ({ pokemon, roster, setRoster }) => {
             setInRoster(false);
           }
         }}
-        className="absolute right-2 top-2 opacity-80 hover:cursor-pointer hover:animate-pulse"
+        className={`absolute right-2 top-2 hover:cursor-pointer hover:animate-pulse ${inRoster || hovered ? "opacity-80" : "opacity-0"} 
+          
+        }`}
         src={inRoster ? heartIconSelected : heartIcon}
         alt=""
       />

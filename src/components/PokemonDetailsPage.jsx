@@ -1,18 +1,31 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { CapitalizeFirstLetter } from "../utils/utils";
 import LoadingSpinner from "./LoadingSpinner";
+import { saveRoster } from "../utils/storage";
+import heartIcon from "../assets/heart-icon.svg";
+import heartIconSelected from "../assets/heart-icon-selected.svg";
+import { PokemonContext } from "./context/PokemonContext";
 
 export default function PokemonDetailsPage() {
+  const { roster, setRoster } = useContext(PokemonContext);
   const [pokemon, setPokemon] = useState(null);
   const [species, setSpecies] = useState(null);
   const [flavorText, setFlavorText] = useState(null);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState(null);
   const [weaknesses, setWeaknesses] = useState([]);
+  const [inRoster, setInRoster] = useState(false);
   const { id } = useParams();
   const url = `https://pokeapi.co/api/v2/pokemon/${id}`;
+
+  useEffect(() => {
+    if (!pokemon) return;
+    const found = roster.find((x) => x.name === pokemon.name);
+    if (found) setInRoster(true);
+    else setInRoster(false);
+  }, [pokemon]);
 
   useEffect(() => {
     setLoading(true);
@@ -91,7 +104,26 @@ export default function PokemonDetailsPage() {
       ) : (
         <div>
           {/* Top Part */}
-          <p className="text-3xl font-semibold text-center pt-4">{`${CapitalizeFirstLetter(pokemon.name)} #${id}`}</p>
+          <div className="flex items-center justify-center gap-6">
+            <p className="text-3xl font-semibold text-center pt-4">{`${CapitalizeFirstLetter(pokemon.name)} #${id}`}</p>
+            <img
+              onClick={() => {
+                if (!inRoster) {
+                  setInRoster(true);
+                  setRoster([...roster, pokemon]);
+                  saveRoster([...roster, pokemon]);
+                } else {
+                  const r = roster.filter((x) => x.name !== pokemon.name);
+                  setRoster(r);
+                  saveRoster(r);
+                  setInRoster(false);
+                }
+              }}
+              className="w-8 pt-4 opacity-80 hover:cursor-pointer hover:animate-pulse"
+              src={inRoster ? heartIconSelected : heartIcon}
+              alt=""
+            />
+          </div>
           <div className="flex justify-center gap-12 mt-4">
             <img className="w-1/3" src={pokemon.sprites.front_default} alt="" />
             <div className="w-1/3 flex flex-col gap-4">
