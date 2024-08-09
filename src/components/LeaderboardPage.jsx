@@ -9,9 +9,7 @@ export default function LeaderboardPage() {
   const [isChecked, setIsChecked] = useState(true);
 
   useEffect(() => {
-    const url = `${import.meta.env.VITE_SERVER_URI}:${
-      import.meta.env.VITE_SERVER_PORT
-    }/leaderboard`;
+    const url = `${import.meta.env.VITE_SERVER_URI}/leaderboard`;
     axios
       .get(url)
       .then((res) => {
