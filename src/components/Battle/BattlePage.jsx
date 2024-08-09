@@ -197,7 +197,7 @@ export default function BattlePage() {
       if (attacker.types.includes(weakness)) {
         dmgMul = 2;
         // console.log(attacker.name + " has weakness to " + weakness + "! Double damage!");
-        weaknessLog = "2x damage! " + CapitalizeFirstLetter(defender.name) + " is weak to '" + weakness + "'";
+        weaknessLog = "Double damage! " + CapitalizeFirstLetter(defender.name) + " is weak to '" + CapitalizeFirstLetter(weakness) + "'";
         break;
       }
     }
@@ -396,7 +396,7 @@ export default function BattlePage() {
               </div>
             )}
             <div className="mb-4 py-4  flex justify-center">
-              <div className="text-left max-w-[30rem] m-auto ">
+              <div className="text-left w-full m-auto flex flex-col gap-3">
                 {combatLog.map((entry, index) => {
                   return <LogEntry key={index} entry={entry} />;
                 })}
