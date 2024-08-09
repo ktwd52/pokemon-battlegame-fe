@@ -19,8 +19,8 @@ export default function BattlePage() {
   const [editName, setEditName] = useState(false);
   const { roster } = useContext(PokemonContext);
   const [loading, setLoading] = useState(true);
-  const [playerPoki, setPlayerPoki] = useState(getBattlePoki(dummyPokemon1));
-  const [enemyPoki, setEnemyPoki] = useState(getBattlePoki(dummyPokemon2));
+  const [playerPoki, setPlayerPoki] = useState(null);
+  const [enemyPoki, setEnemyPoki] = useState(null);
   const [combatInProgress, setCombatInProgress] = useState(false);
   const [combatMode, setCombatMode] = useState(false);
   const [combatLog, setCombatLog] = useState([]);
@@ -33,6 +33,7 @@ export default function BattlePage() {
   const [playerWon, setPlayerWon] = useState(false);
   const [enemyWon, setEnemyWon] = useState(false);
   const [newEnemy, setNewEnemy] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   let requestSent = false;
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function BattlePage() {
       .then((res) => {
         // console.log(res.data);
         setEnemyPoki(getBattlePoki(res.data));
+        onEnemyPokiSet(getBattlePoki(res.data));
       })
       .catch((err) => console.log(err))
       .finally(() => {
@@ -56,12 +58,17 @@ export default function BattlePage() {
     };
   }, [newEnemy]);
 
+  function onEnemyPokiSet() {}
+
+  function onPlayerPokiSet() {}
+
   function resetBattle() {
     setEnemyWon(false);
     setPlayerWon(false);
     setWinner("Undefined");
     setCombatMode(false);
     setEnemyPoki({ ...enemyPoki, hp: enemyPoki.maxHp });
+    onEnemyPokiSet({ ...enemyPoki, hp: enemyPoki.maxHp });
     setCombatLog([]);
   }
 
@@ -76,12 +83,14 @@ export default function BattlePage() {
     setCombatMode(true);
     setCombatInProgress(true);
     setPlayerPoki({ ...playerPoki, hp: playerPoki.maxHp });
+    onPlayerPokiSet({ ...playerPoki, hp: playerPoki.maxHp });
   }
 
   let attacker = "player";
 
   // useEffect to handle the battle logic and interval
   useEffect(() => {
+    if (!enemyPoki || !playerPoki) return;
     if (enemyPoki.spd > playerPoki.spd) attacker = "enemy";
 
     const interval = setInterval(() => {
@@ -154,10 +163,19 @@ export default function BattlePage() {
   }
 
   function attack(attacker, defender, attackerText) {
-    const dmg = calculateDamage(attacker, defender);
-    defender.hp -= dmg;
+    let weaknessLog = "";
+    const dmgResult = calculateDamage(attacker, defender, weaknessLog);
+    // console.log(dmgResult.weaknessLog);
+    defender.hp -= dmgResult.dmg;
     setCombatLog((prev) => [
-      { color: attackerText, attacker: attacker.name, defender: defender.name, damage: dmg, defenderHp: defender.hp },
+      {
+        color: attackerText,
+        attacker: attacker.name,
+        defender: defender.name,
+        damage: dmgResult.dmg,
+        defenderHp: defender.hp,
+        weaknessLog: dmgResult.weaknessLog,
+      },
       ...prev,
     ]);
     if (defender.hp <= 0) {
@@ -169,9 +187,24 @@ export default function BattlePage() {
   }
 
   function calculateDamage(attacker, defender) {
+    let dmgMul = 1;
+    let weaknessLog = "";
+    // console.log("Attacker types: " + attacker.types);
+    // console.log("Defender weakness: " + defender.weakness);
+
+    for (let weakness of defender.weakness) {
+      // console.log(weakness);
+      if (attacker.types.includes(weakness)) {
+        dmgMul = 2;
+        // console.log(attacker.name + " has weakness to " + weakness + "! Double damage!");
+        weaknessLog = "2x damage! " + CapitalizeFirstLetter(defender.name) + " is weak to '" + weakness + "'";
+        break;
+      }
+    }
+
     const randomFactor = Math.random() * 0.5 + 0.5; // Damage deviation [0.75 - 1.25]
     // alert(`Atk = ${attacker.atk}, Def = ${defender.def}, randomFactor = ${randomFactor * 10}`);
-    return Math.floor((attacker.atk / defender.def) * randomFactor * 10);
+    return { dmg: Math.floor((attacker.atk / defender.def) * randomFactor * 10 * dmgMul), weaknessLog };
   }
 
   // function ShopPopup(winnerName) {
@@ -180,6 +213,28 @@ export default function BattlePage() {
   // }
 
   function getBattlePoki(pokemon) {
+    if (!pokemon) return;
+    // console.log(pokemon);
+
+    const _weaknesses = [];
+    for (let i = 0; i < pokemon.types.length; i++) {
+      axios
+        .get(pokemon.types[i].type.url)
+        .then((res) => {
+          for (let weakness of res.data.damage_relations.double_damage_from) {
+            if (!_weaknesses.includes(weakness.name)) _weaknesses.push(weakness.name);
+          }
+        })
+        .catch((err) => console.log(err))
+        .finally(() => {
+          setRefresh(!refresh);
+        });
+    }
+
+    const _types = pokemon.types.map((x) => {
+      return x.type.name;
+    });
+
     return {
       name: pokemon.name,
       sprite: pokemon.sprites.front_default,
@@ -188,6 +243,8 @@ export default function BattlePage() {
       spd: pokemon.stats[5].base_stat,
       hp: pokemon.stats[0].base_stat,
       maxHp: pokemon.stats[0].base_stat,
+      weakness: _weaknesses,
+      types: _types,
     };
   }
 
@@ -208,6 +265,7 @@ export default function BattlePage() {
                   key={pokemon.name}
                   onClick={(e) => {
                     setPlayerPoki(getBattlePoki(pokemon));
+                    onPlayerPokiSet(getBattlePoki(pokemon));
                     setCombatMode(false);
                     resetBattle();
                   }}
@@ -276,18 +334,34 @@ export default function BattlePage() {
         </div>
         <p className="text-center text-3xl py-4">Prepare for Battle!</p>
         <Popup winner={winner} />
-        <div className="flex justify-evenly gap-4 mt-6 items-center max-w-[40rem] m-auto pb-4">
-          <div
-            className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150 
-              ${fleshPlayer && `border-opacity-100`} ${playerAttack && `scale-110`} ${playerWon && `scale-125 border-success border-opacity-100`}`}>
-            <PokemonBattleCard pokemon={playerPoki} />
-          </div>
+        <div className=" flex justify-evenly gap-4 mt-6 items-center max-w-[60rem] m-auto pb-4">
+          {playerPoki ? (
+            <div className="flex gap-4">
+              <div className="flex flex-col justify-between ">
+                <PokemonTypes pokemon={playerPoki} />
+                <PokemonWeaknesses pokemon={playerPoki} isCombat={combatMode} />
+              </div>
+              <div
+                className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150
+                ${fleshPlayer && `border-opacity-100`} ${playerAttack && `scale-110`} ${playerWon && `scale-125 border-success border-opacity-100`}`}>
+                <PokemonBattleCard pokemon={playerPoki} />
+              </div>
+            </div>
+          ) : (
+            <div className="skeleton bg-secondary rounded-xl h-[20rem] w-[12rem]"></div>
+          )}
           <p className="text-3xl">VS</p>
-          {!loading ? (
-            <div
-              className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150 min-h-[20rem] min-w-[12rem]
+          {!loading && enemyPoki ? (
+            <div className="flex gap-4">
+              <div
+                className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150 min-h-[20rem] min-w-[12rem]
             ${fleshEnemy && `border-opacity-100`} ${enemyAttack && `scale-110`}  ${enemyWon && `scale-125 border-success border-opacity-100`}`}>
-              <PokemonBattleCard pokemon={enemyPoki} />
+                <PokemonBattleCard pokemon={enemyPoki} />
+              </div>
+              <div className="flex flex-col justify-between ">
+                <PokemonTypes pokemon={enemyPoki} />
+                <PokemonWeaknesses pokemon={enemyPoki} isCombat={combatMode} />
+              </div>
             </div>
           ) : (
             <div>
@@ -311,6 +385,7 @@ export default function BattlePage() {
                       onClick={() => {
                         resetBattle();
                         setPlayerPoki({ ...playerPoki, hp: playerPoki.maxHp });
+                        onPlayerPokiSet({ ...playerPoki, hp: playerPoki.maxHp });
                         setNewEnemy(!newEnemy);
                       }}
                       className={`btn btn-outline btn-neutral my-4`}>
@@ -330,9 +405,11 @@ export default function BattlePage() {
           </div>
         ) : (
           <div className="max-w-[60rem] m-auto text-center flex justify-around">
-            <button onClick={handleStart} className="btn btn-outline btn-accent my-4 btn-lg">
-              Start Battle!
-            </button>
+            {playerPoki && (
+              <button onClick={handleStart} className="btn btn-outline btn-accent my-4 btn-lg">
+                Start Battle!
+              </button>
+            )}
             <button
               onClick={() => {
                 resetBattle();
@@ -361,5 +438,46 @@ const Popup = ({ winner }) => {
         </form>
       </dialog>
     </>
+  );
+};
+
+const PokemonTypes = ({ pokemon }) => {
+  // console.log(pokemon);
+  return (
+    <div className="">
+      <p className="text-center mb-1">Types:</p>
+      <div className="flex flex-col gap-1">
+        {pokemon.types.map((x, index) => {
+          return (
+            <div key={index} className="italic text-warning-content bg-warning px-2 rounded-md font-semibold">
+              {CapitalizeFirstLetter(x)}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const PokemonWeaknesses = ({ pokemon, isCombat }) => {
+  // console.log(pokemon);
+  // if (pokemon.weakness.length == 0) return;
+  return (
+    <div className="">
+      <p className="text-center mb-1">Weakness:</p>
+      {isCombat ? (
+        <div className="flex flex-col gap-1">
+          {pokemon.weakness.map((x, index) => {
+            return (
+              <div key={index} className="italic text-accent-content bg-accent px-2 rounded-md font-semibold">
+                {CapitalizeFirstLetter(x)}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="text-center font-semibold text-warning">???</div>
+      )}
+    </div>
   );
 };
