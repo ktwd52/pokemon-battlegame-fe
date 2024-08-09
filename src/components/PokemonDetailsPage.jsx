@@ -192,7 +192,11 @@ export default function PokemonDetailsPage() {
                 <p>Type</p>
                 <div className="flex gap-4 flex-wrap text-warning">
                   {pokemon.types.map((type, index) => {
-                    return <p key={index}>{CapitalizeFirstLetter(type.type.name)}</p>;
+                    return (
+                      <p className="bg-warning text-warning-content px-3 py-1 text-lg rounded-lg mt-1" key={index}>
+                        {CapitalizeFirstLetter(type.type.name)}
+                      </p>
+                    );
                   })}
                 </div>
               </div>
@@ -200,7 +204,11 @@ export default function PokemonDetailsPage() {
                 <p>Weaknesses</p>
                 <div className="flex flex-wrap gap-4 text-warning">
                   {weaknesses.map((x, index) => {
-                    return <p key={index}>{CapitalizeFirstLetter(x)}</p>;
+                    return (
+                      <p className="bg-accent text-accent-content px-3 py-1 text-lg rounded-lg mt-1" key={index}>
+                        {CapitalizeFirstLetter(x)}
+                      </p>
+                    );
                   })}
                 </div>
               </div>
