@@ -37,10 +37,10 @@ export default function BattlePage() {
   const [refresh, setRefresh] = useState(false);
   let requestSent = false;
 
+  const getUserScoreUrl = `${serverConfig.serverUri}:${serverConfig.serverPort}/leaderboard/${userName}`;
   useEffect(() => {
-    //http://localhost:3007/leaderboard/user
     axios
-      .get(`http://localhost:3007/leaderboard/${userName}`)
+      .get(getUserScoreUrl)
       .then((res) => setScore({ wins: res.data.wins, loses: res.data.losses, score: res.data.score }))
       .catch((err) => console.log(err))
       .finally(() => {});
