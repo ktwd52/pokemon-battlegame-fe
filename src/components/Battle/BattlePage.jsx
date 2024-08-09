@@ -8,6 +8,7 @@ import { PokemonContext } from "../context/PokemonContext";
 import axios from "axios";
 import serverConfig from "../../utils/serverConfig";
 import { saveUsername, loadUsername } from "../../utils/storage";
+import { useFetcher } from "react-router-dom";
 
 const scoreKey = "poki-score";
 
@@ -25,7 +26,7 @@ export default function BattlePage() {
   const [combatMode, setCombatMode] = useState(false);
   const [combatLog, setCombatLog] = useState([]);
   const [winner, setWinner] = useState("Undefined");
-  const [score, setScore] = useState(JSON.parse(localStorage.getItem(scoreKey)) || { wins: 0, loses: 0 });
+  const [score, setScore] = useState(JSON.parse(localStorage.getItem(scoreKey)) || { wins: 0, loses: 0, score: 0 });
   const [fleshPlayer, setFleshPlayer] = useState(0);
   const [fleshEnemy, setFleshEnemy] = useState(0);
   const [playerAttack, setPlayerAttack] = useState(false);
@@ -35,6 +36,15 @@ export default function BattlePage() {
   const [newEnemy, setNewEnemy] = useState(false);
   const [refresh, setRefresh] = useState(false);
   let requestSent = false;
+
+  useEffect(() => {
+    //http://localhost:3007/leaderboard/user
+    axios
+      .get(`http://localhost:3007/leaderboard/${userName}`)
+      .then((res) => setScore({ wins: res.data.wins, loses: res.data.losses, score: res.data.score }))
+      .catch((err) => console.log(err))
+      .finally(() => {});
+  }, [userName]);
 
   useEffect(() => {
     if (requestSent) return;
@@ -309,18 +319,21 @@ export default function BattlePage() {
                   placeholder="Enter Username"
                   className="input input-bordered w-full max-w-xs"
                 />
-                <button
-                  className="btn btn-outline btn-success btn-sm"
-                  onClick={() => {
-                    setEditName(false);
-                    if (newUsername !== userName) {
-                      setScore({ wins: 0, loses: 0 });
-                      saveUsername(newUsername);
-                    }
-                    setUserName(newUsername);
-                  }}>
-                  Confirm
-                </button>
+                {newUsername != "" && (
+                  <button
+                    className="btn btn-outline btn-success btn-sm"
+                    onClick={() => {
+                      if (newUsername == "") return;
+                      setEditName(false);
+                      if (newUsername !== userName) {
+                        setScore({ wins: 0, loses: 0 });
+                        saveUsername(newUsername);
+                      }
+                      setUserName(newUsername);
+                    }}>
+                    Confirm
+                  </button>
+                )}
                 <button onClick={() => setEditName(false)} className="btn btn-outline btn-neutral btn-sm">
                   Cancel
                 </button>
