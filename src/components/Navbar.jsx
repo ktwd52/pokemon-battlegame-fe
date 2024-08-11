@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useEffect } from "react";
+import Search from "./Search";
 
 export default function Navbar() {
   useEffect(() => {
@@ -8,18 +9,12 @@ export default function Navbar() {
 
   return (
     <div className="bg-primary text-primary-content">
-      <div className="navbar  max-w-[60rem] m-auto">
-        <div className="flex-1 ">
-          <NavLink
-            to="battle"
-            className={({ isActive }) =>
-              isActive ? "bg-base-300 text-base-content" : ""
-            }
-          >
-            <p className="btn btn-ghost text-xl">To Battle!</p>
-          </NavLink>
-        </div>
-        <nav className="flex-none">
+      <div className="  max-w-[60rem] m-auto flex justify-around items-center py-2 ">
+        <NavLink to="battle" className={({ isActive }) => (isActive ? "bg-base-300 text-base-content" : "")}>
+          <p className="btn btn-ghost text-xl">To Battle!</p>
+        </NavLink>
+        <Search />
+        <nav className="">
           <ul className="menu menu-horizontal px-1 text-lg">
             <li>
               <NavLink to="/">Pokemons </NavLink>

@@ -12,8 +12,8 @@ import { PokemonProvider } from "./components/context/PokemonContext";
 const MainLayout = () => {
   return (
     <>
-      <Navbar />
       <PokemonProvider>
+        <Navbar />
         <Outlet />
       </PokemonProvider>
       <Footer />
