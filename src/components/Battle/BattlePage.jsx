@@ -13,7 +13,7 @@ import { useFetcher } from "react-router-dom";
 const scoreKey = "poki-score";
 
 export default function BattlePage() {
-  const postToLeaderboard = `${serverConfig.serverUri}:${serverConfig.serverPort}/leaderboard`;
+  const postToLeaderboard = `${serverConfig.serverUri}/leaderboard`;
   // console.log(postToLeaderboard);
   const [userName, setUserName] = useState(loadUsername());
   const [newUsername, setNewUsername] = useState(userName);
@@ -37,7 +37,7 @@ export default function BattlePage() {
   const [refresh, setRefresh] = useState(false);
   let requestSent = false;
 
-  const getUserScoreUrl = `${serverConfig.serverUri}:${serverConfig.serverPort}/leaderboard/${userName}`;
+  const getUserScoreUrl = `${serverConfig.serverUri}/leaderboard/${userName}`;
   useEffect(() => {
     axios
       .get(getUserScoreUrl)
