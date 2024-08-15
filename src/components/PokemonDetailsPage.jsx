@@ -62,7 +62,7 @@ export default function PokemonDetailsPage() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [id]);
 
   function calcGender(rate) {
     // console.log(rate);

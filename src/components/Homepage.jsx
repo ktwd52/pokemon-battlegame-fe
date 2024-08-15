@@ -3,7 +3,7 @@ import axios from "axios";
 import { useState, useEffect, useContext } from "react";
 import LoadingSpinner from "./LoadingSpinner";
 import { CapitalizeFirstLetter } from "../utils/utils";
-import { NavLink } from "react-router-dom";
+import { NavLink, useFetcher } from "react-router-dom";
 import heartIcon from "../assets/heart-icon.svg";
 import heartIconSelected from "../assets/heart-icon-selected.svg";
 import { PokemonContext } from "./context/PokemonContext";
@@ -20,7 +20,7 @@ export default function HomePage() {
   const [url, setUrl] = useState(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
 
   useEffect(() => {
-    // const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
+    // const fullListUrl = `https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0`;
     axios
       .get(url)
       .then((res) => {
