@@ -5,15 +5,15 @@ import { CapitalizeFirstLetter } from "../utils/utils";
 import { NavLink } from "react-router-dom";
 
 //Find a parent element from child element
-function FindParentElement(elementToFind, startingElement) {
-  let currentElement = startingElement;
-  if (currentElement == elementToFind) return true;
-  while (currentElement.parentElement) {
-    currentElement = currentElement.parentElement;
-    if (currentElement == elementToFind) return true;
-  }
-  return false;
-}
+// function FindParentElement(elementToFind, startingElement) {
+//   let currentElement = startingElement;
+//   if (currentElement == elementToFind) return true;
+//   while (currentElement.parentElement) {
+//     currentElement = currentElement.parentElement;
+//     if (currentElement == elementToFind) return true;
+//   }
+//   return false;
+// }
 
 export default function Search() {
   const [search, setSearch] = useState("");
