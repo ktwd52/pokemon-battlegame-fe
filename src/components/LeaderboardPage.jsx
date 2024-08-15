@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import LoadingSpinner from "./LoadingSpinner.jsx";
+import serverConfig from "../utils/serverConfig.js";
 import axios from "axios";
 
 export default function LeaderboardPage() {
@@ -9,8 +10,7 @@ export default function LeaderboardPage() {
   const [isChecked, setIsChecked] = useState(true);
 
   useEffect(() => {
-    const url = `${import.meta.env.VITE_SERVER_URI}/leaderboard`;
-
+    const url = `${serverConfig.serverUri}/leaderboard`;
     axios
       .get(url)
       .then((res) => {

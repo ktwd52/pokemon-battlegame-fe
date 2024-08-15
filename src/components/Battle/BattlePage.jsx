@@ -26,7 +26,13 @@ export default function BattlePage() {
   const [combatMode, setCombatMode] = useState(false);
   const [combatLog, setCombatLog] = useState([]);
   const [winner, setWinner] = useState("Undefined");
-  const [score, setScore] = useState(JSON.parse(localStorage.getItem(scoreKey)) || { wins: 0, loses: 0, score: 0 });
+  const [score, setScore] = useState(
+    JSON.parse(localStorage.getItem(scoreKey)) || {
+      wins: 0,
+      loses: 0,
+      score: 0,
+    }
+  );
   const [fleshPlayer, setFleshPlayer] = useState(0);
   const [fleshEnemy, setFleshEnemy] = useState(0);
   const [playerAttack, setPlayerAttack] = useState(false);
@@ -41,7 +47,13 @@ export default function BattlePage() {
   useEffect(() => {
     axios
       .get(getUserScoreUrl)
-      .then((res) => setScore({ wins: res.data.wins, loses: res.data.losses, score: res.data.score }))
+      .then((res) =>
+        setScore({
+          wins: res.data.wins,
+          loses: res.data.losses,
+          score: res.data.score,
+        })
+      )
       .catch((err) => console.log(err))
       .finally(() => {});
   }, [userName]);
@@ -168,7 +180,11 @@ export default function BattlePage() {
   }
 
   function EndGame(_score) {
-    const body = { username: userName, wins: _score.wins, losses: _score.loses };
+    const body = {
+      username: userName,
+      wins: _score.wins,
+      losses: _score.loses,
+    };
     axios.post(postToLeaderboard, body).catch((err) => console.log(err));
   }
 
@@ -207,14 +223,24 @@ export default function BattlePage() {
       if (attacker.types.includes(weakness)) {
         dmgMul = 2;
         // console.log(attacker.name + " has weakness to " + weakness + "! Double damage!");
-        weaknessLog = "Double damage! " + CapitalizeFirstLetter(defender.name) + " is weak to '" + CapitalizeFirstLetter(weakness) + "'";
+        weaknessLog =
+          "Double damage! " +
+          CapitalizeFirstLetter(defender.name) +
+          " is weak to '" +
+          CapitalizeFirstLetter(weakness) +
+          "'";
         break;
       }
     }
 
     const randomFactor = Math.random() * 0.5 + 0.5; // Damage deviation [0.75 - 1.25]
     // alert(`Atk = ${attacker.atk}, Def = ${defender.def}, randomFactor = ${randomFactor * 10}`);
-    return { dmg: Math.floor((attacker.atk / defender.def) * randomFactor * 10 * dmgMul), weaknessLog };
+    return {
+      dmg: Math.floor(
+        (attacker.atk / defender.def) * randomFactor * 10 * dmgMul
+      ),
+      weaknessLog,
+    };
   }
 
   // function ShopPopup(winnerName) {
@@ -232,7 +258,8 @@ export default function BattlePage() {
         .get(pokemon.types[i].type.url)
         .then((res) => {
           for (let weakness of res.data.damage_relations.double_damage_from) {
-            if (!_weaknesses.includes(weakness.name)) _weaknesses.push(weakness.name);
+            if (!_weaknesses.includes(weakness.name))
+              _weaknesses.push(weakness.name);
           }
         })
         .catch((err) => console.log(err))
@@ -279,7 +306,8 @@ export default function BattlePage() {
                     setCombatMode(false);
                     resetBattle();
                   }}
-                  className="hover:cursor-pointer border-[2px] border-opacity-25 border-accent hover:border-opacity-100 rounded-xl">
+                  className="hover:cursor-pointer border-[2px] border-opacity-25 border-accent hover:border-opacity-100 rounded-xl"
+                >
                   <PokemonCard pokemon={pokemon} />
                 </div>
               );
@@ -305,7 +333,8 @@ export default function BattlePage() {
                     onClick={() => {
                       setNewUsername(userName);
                       setEditName(true);
-                    }}>
+                    }}
+                  >
                     Change Name
                   </button>
                 )}
@@ -330,11 +359,15 @@ export default function BattlePage() {
                         saveUsername(newUsername);
                       }
                       setUserName(newUsername);
-                    }}>
+                    }}
+                  >
                     Confirm
                   </button>
                 )}
-                <button onClick={() => setEditName(false)} className="btn btn-outline btn-neutral btn-sm">
+                <button
+                  onClick={() => setEditName(false)}
+                  className="btn btn-outline btn-neutral btn-sm"
+                >
                   Cancel
                 </button>
               </div>
@@ -356,7 +389,12 @@ export default function BattlePage() {
               </div>
               <div
                 className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150
-                ${fleshPlayer && `border-opacity-100`} ${playerAttack && `scale-110`} ${playerWon && `scale-125 border-success border-opacity-100`}`}>
+                ${fleshPlayer && `border-opacity-100`} ${
+                  playerAttack && `scale-110`
+                } ${
+                  playerWon && `scale-125 border-success border-opacity-100`
+                }`}
+              >
                 <PokemonBattleCard pokemon={playerPoki} />
               </div>
             </div>
@@ -368,7 +406,12 @@ export default function BattlePage() {
             <div className="flex gap-4">
               <div
                 className={`border-[2px] rounded-xl border-error border-opacity-0 transition-all duration-150 min-h-[20rem] min-w-[12rem]
-            ${fleshEnemy && `border-opacity-100`} ${enemyAttack && `scale-110`}  ${enemyWon && `scale-125 border-success border-opacity-100`}`}>
+            ${fleshEnemy && `border-opacity-100`} ${
+                  enemyAttack && `scale-110`
+                }  ${
+                  enemyWon && `scale-125 border-success border-opacity-100`
+                }`}
+              >
                 <PokemonBattleCard pokemon={enemyPoki} />
               </div>
               <div className="flex flex-col justify-between ">
@@ -388,20 +431,29 @@ export default function BattlePage() {
               <div className="bg-primary py-4 mt-4 text-xl">Battle log</div>
             ) : (
               <div className="bg-error text-error-content font-semibold px-4 mt-4 text-xl flex justify-between items-center">
-                <div className="text-xl">{CapitalizeFirstLetter(winner)} has won!</div>
+                <div className="text-xl">
+                  {CapitalizeFirstLetter(winner)} has won!
+                </div>
                 {!combatInProgress && (
                   <div className="flex gap-3">
-                    <button onClick={handleRetry} className="btn btn-outline btn-base my-4">
+                    <button
+                      onClick={handleRetry}
+                      className="btn btn-outline btn-base my-4"
+                    >
                       Try again
                     </button>
                     <button
                       onClick={() => {
                         resetBattle();
                         setPlayerPoki({ ...playerPoki, hp: playerPoki.maxHp });
-                        onPlayerPokiSet({ ...playerPoki, hp: playerPoki.maxHp });
+                        onPlayerPokiSet({
+                          ...playerPoki,
+                          hp: playerPoki.maxHp,
+                        });
                         setNewEnemy(!newEnemy);
                       }}
-                      className={`btn btn-outline btn-neutral my-4`}>
+                      className={`btn btn-outline btn-neutral my-4`}
+                    >
                       Find Opponent
                     </button>
                   </div>
@@ -419,7 +471,10 @@ export default function BattlePage() {
         ) : (
           <div className="max-w-[60rem] m-auto text-center flex justify-around">
             {playerPoki && (
-              <button onClick={handleStart} className="btn btn-outline btn-accent my-4 btn-lg">
+              <button
+                onClick={handleStart}
+                className="btn btn-outline btn-accent my-4 btn-lg"
+              >
                 Start Battle!
               </button>
             )}
@@ -428,7 +483,8 @@ export default function BattlePage() {
                 resetBattle();
                 setNewEnemy(!newEnemy);
               }}
-              className={`btn btn-outline btn-neutral btn-lg my-4`}>
+              className={`btn btn-outline btn-neutral btn-lg my-4`}
+            >
               Find Opponent
             </button>
           </div>
@@ -462,7 +518,10 @@ const PokemonTypes = ({ pokemon }) => {
       <div className="flex flex-col gap-1">
         {pokemon.types.map((x, index) => {
           return (
-            <div key={index} className="italic text-warning-content bg-warning px-2 rounded-md font-semibold">
+            <div
+              key={index}
+              className="italic text-warning-content bg-warning px-2 rounded-md font-semibold"
+            >
               {CapitalizeFirstLetter(x)}
             </div>
           );
@@ -482,7 +541,10 @@ const PokemonWeaknesses = ({ pokemon, isCombat }) => {
         <div className="flex flex-col gap-1">
           {pokemon.weakness.map((x, index) => {
             return (
-              <div key={index} className="italic text-accent-content bg-accent px-2 rounded-md font-semibold">
+              <div
+                key={index}
+                className="italic text-accent-content bg-accent px-2 rounded-md font-semibold"
+              >
                 {CapitalizeFirstLetter(x)}
               </div>
             );
